@@ -58,7 +58,7 @@ if firstdegmo:
     first_10deg_month = np.nan*np.zeros((len(unique_year_list),lon.shape[0],lon.shape[1]))
 
 count=0
-for year in unique_year_list[:5]:
+for year in unique_year_list:
     print(f'Working on year {year:}')
     ds = xr.open_mfdataset(data_dir+f'nep_wb_ssp585_moave_{year:}_*.nc')
     SST = ds['temp'].values[:,-1,:,:]
