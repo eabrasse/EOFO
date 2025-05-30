@@ -12,6 +12,7 @@ import string
 import xarray as xr
 from shapely.geometry import LineString, Point, Polygon, MultiPolygon
 import numpy.ma as ma
+import pickle
 
 # load in data and grid
 home = '/home/eabrasse/'
