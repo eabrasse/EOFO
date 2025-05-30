@@ -46,10 +46,10 @@ goa_mask = goa_mask.reshape(lon.shape)
 #initialize some arrays, lists and dataframes
 monthly_goa_mean_SST = []
 dt_list = []
-goa_mean_first_8deg_month = np.zeros(len(unique_year_list))
-goa_mean_first_10deg_month = np.zeros(len(unique_year_list))
-first_8deg_month = np.nan*np.zeros(len(unique_year_list),lon.shape[0],lon.shape[1])
-first_10deg_month = np.nan*np.zeros(len(unique_year_list),lon.shape[0],lon.shape[1])
+goa_mean_first_8deg_month = np.zeros((len(unique_year_list)))
+goa_mean_first_10deg_month = np.zeros((len(unique_year_list)))
+first_8deg_month = np.nan*np.zeros((len(unique_year_list),lon.shape[0],lon.shape[1]))
+first_10deg_month = np.nan*np.zeros((len(unique_year_list),lon.shape[0],lon.shape[1]))
 
 count=0
 for year in unique_year_list:
