@@ -46,40 +46,45 @@ goa_mask = np.array([newpoly.contains(point) for point in a])
 goa_mask = goa_mask.reshape(lon.shape)
 
 #initialize some arrays, lists and dataframes
-monthly_goa_mean_SST = []
-dt_list = []
-goa_mean_first_8deg_month = np.zeros((len(unique_year_list)))
-goa_mean_first_10deg_month = np.zeros((len(unique_year_list)))
-first_8deg_month = np.nan*np.zeros((len(unique_year_list),lon.shape[0],lon.shape[1]))
-first_10deg_month = np.nan*np.zeros((len(unique_year_list),lon.shape[0],lon.shape[1]))
+firstdegmo=False
+timeseries=True
+if timeseries:
+    monthly_goa_mean_SST = []
+    dt_list = []
+if firstdegmo:
+    goa_mean_first_8deg_month = np.zeros((len(unique_year_list)))
+    goa_mean_first_10deg_month = np.zeros((len(unique_year_list)))
+    first_8deg_month = np.nan*np.zeros((len(unique_year_list),lon.shape[0],lon.shape[1]))
+    first_10deg_month = np.nan*np.zeros((len(unique_year_list),lon.shape[0],lon.shape[1]))
 
 count=0
-for year in unique_year_list:
+for year in unique_year_list[:5]:
     print(f'Working on year {year:}')
     ds = xr.open_mfdataset(data_dir+f'nep_wb_ssp585_moave_{year:}_*.nc')
     SST = ds['temp'].values[:,-1,:,:]
     
+    if firstdegmo:
+        # np.argmax(condition,axis=x) works to identify the first argument meeting the condition along the axis of interest (axis=0, in this case, time)
+        # dividing by np.any marks any locations where the condition did not occur as np.nan's
+        first8degmo = np.argmax(SST>8,axis=0)/np.any(SST>8,axis=0)
+        first8degmo = ma.masked_where(~(goa_mask&~np.isnan(first8degmo)),first8degmo)
+        first_8deg_month[count,:,:] = first8degmo
+        goa_mean_first_8deg_month[count] = first8degmo.mean()
     
-    # np.argmax(condition,axis=x) works to identify the first argument meeting the condition along the axis of interest (axis=0, in this case, time)
-    # dividing by np.any marks any locations where the condition did not occur as np.nan's
-    first8degmo = np.argmax(SST>8,axis=0)/np.any(SST>8,axis=0)
-    first8degmo = ma.masked_where(~(goa_mask&~np.isnan(first8degmo)),first8degmo)
-    first_8deg_month[count,:,:] = first8degmo
-    goa_mean_first_8deg_month[count] = first8degmo.mean()
+        # repeat for 10 deg to compare
+        first10degmo = np.argmax(SST>10,axis=0)/np.any(SST>10,axis=0)
+        first10degmo = ma.masked_where(~(goa_mask&~np.isnan(first10degmo)),first10degmo)
+        first_10deg_month[count,:,:] = first10degmo
+        goa_mean_first_10deg_month[count] = first10degmo.mean()
     
-    # repeat for 10 deg to compare
-    first10degmo = np.argmax(SST>10,axis=0)/np.any(SST>10,axis=0)
-    first10degmo = ma.masked_where(~(goa_mask&~np.isnan(first10degmo)),first10degmo)
-    first_10deg_month[count,:,:] = first10degmo
-    goa_mean_first_10deg_month[count] = first10degmo.mean()
-    
-    #now calculate a few things for each month
-    for t in range(nmonths):
-        dt = ds['ocean_time'].values[t]
-        dt_list.append(dt)
+    if timeseries:
+        #now calculate a few things for each month
+        for t in range(nmonths):
+            dt = ds['ocean_time'].values[t]
+            dt_list.append(dt)
         
-        SST_ma = ma.masked_where(~goa_mask,ds.temp.values[t,-1,:,:])
-        monthly_goa_mean_SST.append(SST_ma.mean())
+            SST_ma = ma.masked_where(~goa_mask,ds.temp.values[t,-1,:,:])
+            monthly_goa_mean_SST.append(np.nanmean(SST_ma))
     
     
     ds.close()
@@ -87,14 +92,17 @@ for year in unique_year_list:
 
 print('All done!')
 print('Packing data for output')
-df_monthly = pd.DataFrame({'Monthly GOA mean SST':monthly_goa_mean_SST,'Datetime':dt_list})
-df_monthly.to_csv(home+'data/nep_wb_ssp585_Monthly_GOA_Mean_SST.csv')
+if timeseries:
+    df_monthly = pd.DataFrame({'Monthly GOA mean SST':monthly_goa_mean_SST,'Datetime':dt_list})
+    df_monthly.to_csv(home+'data/nep_wb_ssp585_Monthly_GOA_Mean_SST.csv')
 
-D = {'first_8deg_month':first_8deg_month,'goa_mean_first_8deg_month':goa_mean_first_8deg_month,'first_10deg_month':first_10deg_month,'goa_mean_first_10deg_month':goa_mean_first_10deg_month,\
-'year_list':unique_year_list,'goa_mask':goa_mask,'lon_rho':lon,'lat_rho':lat,'mask_rho':dg['mask_rho'].values[:],'h':dg['h'].values[:]}
+if firstdegmo:
+    D = {'first_8deg_month':first_8deg_month,'goa_mean_first_8deg_month':goa_mean_first_8deg_month,'first_10deg_month':first_10deg_month,'goa_mean_first_10deg_month':goa_mean_first_10deg_month,\
+    'year_list':unique_year_list,'goa_mask':goa_mask,'lon_rho':lon,'lat_rho':lat,'mask_rho':dg['mask_rho'].values[:],'h':dg['h'].values[:]}
     
-outfn = home+'data/nep_wb_ssp585_first_xdeg_month_maps.p'
-pickle.dump(D,open(outfn,'wb'))
+    outfn = home+'data/nep_wb_ssp585_first_xdeg_month_maps.p'
+    pickle.dump(D,open(outfn,'wb'))
+    
 dg.close()
 print('All done!')
 print(':)')
