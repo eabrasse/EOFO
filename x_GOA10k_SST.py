@@ -53,7 +53,7 @@ first_10deg_month = np.nan*np.zeros(len(unique_year_list),lon.shape[0],lon.shape
 
 count=0
 for year in unique_year_list:
-    ds = xr.open_mfdataset(data_dir+f'nep_wb_ssp585_moave_{year:}_*.nc',concat_dim='ocean_time')
+    ds = xr.open_mfdataset(data_dir+f'nep_wb_ssp585_moave_{year:}_*.nc')
     SST = ds['temp'].values[:,-1,:,:]
     SST_ma = ma.masked_where(~goa_mask,ds.temp.values[t,-1,:,:])
     
