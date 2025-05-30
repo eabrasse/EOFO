@@ -3,46 +3,15 @@
 
 import os
 import sys
-ep = os.path.abspath('/Users/elizabethbrasseale/Projects/eDNA/code/')
-if ep not in sys.path:
-    sys.path.append(ep)
-import efun
-import matplotlib
-import matplotlib.pyplot as plt
 import numpy as np
 import netCDF4 as nc
 import pandas as pd
-import cartopy.crs as ccrs
 from datetime import datetime, timedelta
 import pytz
-import cmocean as cmo
-from mpl_toolkits.axes_grid1.inset_locator import inset_axes
-from matplotlib.gridspec import GridSpec
 import string
-import matplotlib.path as mpath
-import cartopy.mpl.patch as cpatch
-import matplotlib.patches as patches
-import cartopy.mpl.ticker as ctk
 import xarray as xr
-import geopandas
 from shapely.geometry import LineString, Point, Polygon, MultiPolygon
-from shapely.ops import split
-from shapely.affinity import translate
 import numpy.ma as ma
-
-#close all currently open figures
-plt.close('all')
-
-# import useful labeling string
-atoz = string.ascii_lowercase
-
-# custom 2-color colormap
-landcol = matplotlib.colors.to_rgba('lightgray')
-seacol = (1.0,1.0,1.0,0)
-cmap_mask = matplotlib.colors.ListedColormap([landcol,seacol])
-
-tab10 = plt.get_cmap('tab10',10)
-Paired = plt.get_cmap('Paired',12)
 
 # load in data and grid
 home = '/home/eabrasse/'
@@ -73,6 +42,7 @@ a = np.array([Point(x, y) for x, y in zip(lon.values.flatten(), lat.values.flatt
 goa_mask = np.array([newpoly.contains(point) for point in a])
 goa_mask = goa_mask.reshape(lon.shape)
 
+#initialize some arrays, lists and dataframes
 df = pd.dataframe()
 monthly_goa_mean_SST = []
 dt_list = []
@@ -80,11 +50,13 @@ goa_mean_first_8deg_month = np.zeros(len(unique_year_list))
 goa_mean_first_10deg_month = np.zeros(len(unique_year_list))
 first_8deg_month = np.nan*np.zeros(len(unique_year_list),lon.shape[0],lon.shape[1])
 first_10deg_month = np.nan*np.zeros(len(unique_year_list),lon.shape[0],lon.shape[1])
+
 count=0
 for year in unique_year_list:
     ds = xr.open_mfdataset(data_dir+f'nep_wb_ssp585_moave_{year:}_*.nc',concat_dim='ocean_time')
     SST = ds['temp'].values[:,-1,:,:]
     SST_ma = ma.masked_where(~goa_mask,ds.temp.values[t,-1,:,:])
+    
     # np.argmax(condition,axis=x) works to identify the first argument meeting the condition along the axis of interest (axis=0, in this case, time)
     # dividing by np.any marks any locations where the condition did not occur as np.nan's
     first8degmo = np.argmax(SST>8,axis=0)/np.any(SST>8,axis=0)
