@@ -73,7 +73,7 @@ for year in unique_year_list:
     
     #now calculate a few things for each month
     for t in range(nmonths):
-        dt = da['ocean_time'].values[t]
+        dt = ds['ocean_time'].values[t]
         dt_list.append(dt)
         monthly_goa_mean_SST.append(SST_ma.mean())
     
