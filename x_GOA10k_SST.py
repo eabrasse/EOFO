@@ -63,7 +63,7 @@ for year in unique_year_list:
     # np.argmax(condition,axis=x) works to identify the first argument meeting the condition along the axis of interest (axis=0, in this case, time)
     # dividing by np.any marks any locations where the condition did not occur as np.nan's
     first8degmo = np.argmax(SST>8,axis=0)/np.any(SST>8,axis=0)
-    first8degmo = ma.masked_where(~(goa_mask&~np.isnan(first10degmo)),first8degmo)
+    first8degmo = ma.masked_where(~(goa_mask&~np.isnan(first8degmo)),first8degmo)
     first_8deg_month[count,:,:] = first8degmo
     goa_mean_first_8deg_month[count] = first8degmo.mean()
     
