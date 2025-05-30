@@ -8,6 +8,7 @@ import netCDF4 as nc
 import pandas as pd
 from datetime import datetime, timedelta
 import pytz
+import geopandas
 import xarray as xr
 from shapely.geometry import LineString, Point, Polygon, MultiPolygon
 import numpy.ma as ma
