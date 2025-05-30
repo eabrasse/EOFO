@@ -23,8 +23,10 @@ f_list = os.listdir(data_dir) # list all files in folder
 f_list = [x for x in f_list if x[:20]=='nep_wb_ssp585_moave_'] # keep only ocean model files in list
 year_list = [x[20:24] for x in f_list]
 unique_year_list = list(set(year_list))
+unique_year_list.sort()
 month_list = [x[25:27] for x in f_list]
 unique_month_list = list(set(month_list))
+unique_month_list.sort()
 nmonths = len(unique_month_list)
 
 gridfn = dir0+'roms_grd_nep.nc'
@@ -56,7 +58,7 @@ for year in unique_year_list:
     print(f'Working on year {year:}')
     ds = xr.open_mfdataset(data_dir+f'nep_wb_ssp585_moave_{year:}_*.nc')
     SST = ds['temp'].values[:,-1,:,:]
-    SST_ma = ma.masked_where(~goa_mask,ds.temp.values[t,-1,:,:])
+    
     
     # np.argmax(condition,axis=x) works to identify the first argument meeting the condition along the axis of interest (axis=0, in this case, time)
     # dividing by np.any marks any locations where the condition did not occur as np.nan's
@@ -75,6 +77,8 @@ for year in unique_year_list:
     for t in range(nmonths):
         dt = ds['ocean_time'].values[t]
         dt_list.append(dt)
+        
+        SST_ma = ma.masked_where(~goa_mask,ds.temp.values[t,-1,:,:])
         monthly_goa_mean_SST.append(SST_ma.mean())
     
     
