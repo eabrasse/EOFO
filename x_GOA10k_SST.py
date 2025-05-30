@@ -44,7 +44,6 @@ goa_mask = np.array([newpoly.contains(point) for point in a])
 goa_mask = goa_mask.reshape(lon.shape)
 
 #initialize some arrays, lists and dataframes
-df = pd.dataframe()
 monthly_goa_mean_SST = []
 dt_list = []
 goa_mean_first_8deg_month = np.zeros(len(unique_year_list))
@@ -54,6 +53,7 @@ first_10deg_month = np.nan*np.zeros(len(unique_year_list),lon.shape[0],lon.shape
 
 count=0
 for year in unique_year_list:
+    print(f'Working on year {year:}')
     ds = xr.open_mfdataset(data_dir+f'nep_wb_ssp585_moave_{year:}_*.nc')
     SST = ds['temp'].values[:,-1,:,:]
     SST_ma = ma.masked_where(~goa_mask,ds.temp.values[t,-1,:,:])
@@ -77,10 +77,13 @@ for year in unique_year_list:
         dt_list.append(dt)
         monthly_goa_mean_SST.append(SST_ma.mean())
     
-
+    
+    ds.close()
     count+=1
 
-df_monthly = pd.dataframe({'Monthly GOA mean SST':monthly_goa_mean_SST,'Datetime':dt_list})
+print('All done!')
+print('Packing data for output')
+df_monthly = pd.DataFrame({'Monthly GOA mean SST':monthly_goa_mean_SST,'Datetime':dt_list})
 df_monthly.to_csv(home+'data/nep_wb_ssp585_Monthly_GOA_Mean_SST.csv')
 
 D = {'first_8deg_month':first_8deg_month,'goa_mean_first_8deg_month':goa_mean_first_8deg_month,'first_10deg_month':first_10deg_month,'goa_mean_first_10deg_month':goa_mean_first_10deg_month,\
@@ -88,3 +91,6 @@ D = {'first_8deg_month':first_8deg_month,'goa_mean_first_8deg_month':goa_mean_fi
     
 outfn = home+'data/nep_wb_ssp585_first_xdeg_month_maps.p'
 pickle.dump(D,open(outfn,'wb'))
+dg.close()
+print('All done!')
+print(':)')
