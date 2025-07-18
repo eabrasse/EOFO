@@ -22,12 +22,12 @@ which_SSP = 585
 match which_SSP:
     case 126:
         dir0 = '/ahr0/emilyln/goa-output/nep_klone/h126wb/'
-        print('Loading multifile dataset...')
+        print(f'Loading multifile dataset for SSP {which_SSP}...')
         ds = xr.open_mfdataset(dir0+'h126wb03_avg_*.nc') # this step takes a few minutes, as i/o always does
         print('Done loading!')
     case 585:
         dir0 = '/ahr0/hermann/goa-output/nep_klone/h585wb/'
-        print('Loading multifile dataset...')
+        print(f'Loading multifile dataset for SSP {which_SSP}...')
         ds = xr.open_mfdataset(dir0+'h585wb0[4-5]_avg_*.nc') # this step takes a few minutes, as i/o always does
         print('Done loading!')    
 
@@ -37,10 +37,11 @@ nyears = len(years)
 
 dd85 = np.zeros((nyears,ny,nx)) 
 
-testing=True
+testing=False
 
 if testing:
     nyears=3
+    print('Testing turned on')
     
 for i in range(nyears):
     print(f'Working on year {years[i]}')
