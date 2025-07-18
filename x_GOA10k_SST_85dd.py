@@ -52,7 +52,7 @@ for i in range(nyears):
     surftemp_cs = np.cumsum(surftemp,axis=0)
     dd85[i,:,:] = np.argmax(surftemp_cs>85,axis=0)/np.any(surftemp_cs>85,axis=0)
 
-outfn = home +f'h{which_SSP}wb_2015-2100_85dd.p'
+outfn = home +f'data/h{which_SSP}wb_2015-2100_85dd.p'
 D = {'dd85':dd85,'years':years}
 pickle.dump(D,open(outfn,'wb'))
 
