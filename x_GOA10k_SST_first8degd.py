@@ -35,7 +35,7 @@ nt,nz,ny,nx = ds['temp'].shape
 years = np.unique(ds['ocean_time.year'].values)
 nyears = len(years)
 
-dd85 = np.zeros((nyears,ny,nx)) 
+first8degday = np.zeros((nyears,ny,nx)) 
 
 testing=False
 
