@@ -17,7 +17,7 @@ import pickle
 # load in data and grid
 home = '/home/eabrasse/'
 
-which_SSP = 585
+which_SSP = 126
 
 match which_SSP:
     case 126:
