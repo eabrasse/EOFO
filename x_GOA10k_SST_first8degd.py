@@ -55,7 +55,7 @@ for i in range(nyears):
     ds0 = ds.where(ds['ocean_time.year']==years[i],drop=True)[['ocean_time','temp']]
 
     surftemp = ds0['temp'][:,-1,:,:].values
-    first8degday[i,:,:] = np.argmax(surftemp[daystoignore:]>8,axis=0)/np.any(surftemp[daystoignore:]>8,axis=0)+daystoignore
+    first8degday[i,:,:] = np.argmax(surftemp[daystoignore:,:,:]>8,axis=0)/np.any(surftemp[daystoignore:,:,:]>8,axis=0)+daystoignore
 
 outfn = home +f'data/h{which_SSP}wb_2015-2100_first8degday_ignore45.p'
 D = {'first8degday':first8degday,'years':years}
