@@ -42,16 +42,22 @@ testing=False
 if testing:
     nyears=3
     print('Testing turned on')
-    
+
+# random blip of warm water temps in Jan 2019 is messing with my algorithm.
+# I'm going to try ignoring the first 45 days of the year.
+# this is lazy and irresponsible.
+# the more responsible way to do this would be a low pass filter.
+daystoignore = 45
+
 for i in range(nyears):
     print(f'Working on year {years[i]}')
 
     ds0 = ds.where(ds['ocean_time.year']==years[i],drop=True)[['ocean_time','temp']]
 
     surftemp = ds0['temp'][:,-1,:,:].values
-    first8degday[i,:,:] = np.argmax(surftemp>8,axis=0)/np.any(surftemp>8,axis=0)
+    first8degday[i,:,:] = np.argmax(surftemp[daystoignore:]>8,axis=0)/np.any(surftemp[daystoignore:]>8,axis=0)+daystoignore
 
-outfn = home +f'data/h{which_SSP}wb_2015-2100_first8degday.p'
+outfn = home +f'data/h{which_SSP}wb_2015-2100_first8degday_ignore45.p'
 D = {'first8degday':first8degday,'years':years}
 pickle.dump(D,open(outfn,'wb'))
 
